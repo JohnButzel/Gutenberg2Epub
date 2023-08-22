@@ -12,7 +12,7 @@ def run_ebook_converter(html_directory):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python main_script.py <url>")
+        print("Usage: python cli.py <url>")
         sys.exit(1)
     
     url = sys.argv[1]
