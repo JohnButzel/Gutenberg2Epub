@@ -96,7 +96,7 @@ class MyFrame2(wx.Frame):
             subprocess.run([test_script_path, output_directory])
 
         elif exe == False:      
-            test_script_path = os.path.join(bundle_dir, "test.py")
+            test_script_path = os.path.join(bundle_dir, "converter.py")
             subprocess.run(["python", test_script_path, output_directory])
 
 

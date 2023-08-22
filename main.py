@@ -8,7 +8,7 @@ def run_scraper(url):
     return output_directory
 
 def run_ebook_converter(html_directory):
-    subprocess.run(["python", "test.py", html_directory])
+    subprocess.run(["python", "converter.py", html_directory])
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
