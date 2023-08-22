@@ -34,8 +34,7 @@ Ersetze `<Directory>` durch den Pfad, wo das Buch gespeichert werden soll.
 
 ## Installation und Anforderungen
 
-Wenn du nicht die exe benutzen willst, kannst du die Python-Skripte benutzen.
-Um die Python-Skripte auszuführen, benötigst du die folgenden Abhängigkeiten:
+Falls du die ausführbare Datei nicht verwenden möchtest, besteht die Möglichkeit, die Python-Skripte zu verwenden. Zur Ausführung der Python-Skripte benötigst du die folgenden Abhängigkeiten:
 
 - Python 3.x
 - Requests-Bibliothek
