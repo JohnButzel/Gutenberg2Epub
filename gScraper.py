@@ -90,19 +90,8 @@ def main():
     if not os.path.exists(images_directory):
         os.makedirs(images_directory)
 
-        
     for chapter_link in chapter_links:
         chapter_url = urljoin(url, chapter_link['href'])
-    #  print(chapter_url)
-
-    #    # Write chapter links to a text file
-    #     chapter_links_filename = os.path.join(output_directory, 'chapter_links.txt')
-    #     with open(chapter_links_filename, 'w', encoding='utf-8') as chapter_links_file:
-    #         for chapter_link in chapter_links:
-    #             if chapter_link['href'] == 'chap001.html':
-    #                 chapter_links_file.write('index.html\n')  # Insert index.html before chap001.html
-    #             chapter_links_file.write(chapter_link['href'] + '\n')
-            
 
         chapter_response = requests.get(chapter_url)
         chapter_response.encoding = 'utf-8'  # Use UTF-8 encoding
@@ -110,8 +99,6 @@ def main():
         
         # Create a BeautifulSoup object for the chapter content
         chapter_soup = BeautifulSoup(chapter_content, 'html.parser')
-
-        
         
         # Find and replace the CSS link for the chapter
         chapter_css_link = chapter_soup.find('link', rel='stylesheet', href=True)
@@ -133,8 +120,6 @@ def main():
             # Replace the image src with the local path
             img_tag['src'] = os.path.join('images', img_name)
 
-        
-    
         # Remove unwanted <h5> elements
         h5_elements = chapter_soup.find_all('h5')
         for h5 in h5_elements:
