@@ -10,13 +10,10 @@ import argparse
 parser = argparse.ArgumentParser(description="Web scraper with output directory option")
 parser.add_argument("url", help="URL to scrape")
 parser.add_argument("-d", "--output-dir", default="output", help="Directory to save the output")
-
 args = parser.parse_args()
 
 url = args.url
 output_dir = args.output_dir
-
-
 
 # Define the regex pattern
 pattern = r'https://www\.projekt-gutenberg\.org/(.*?)/(.*?)/.*?\.html'
@@ -140,8 +137,7 @@ for chapter_link in chapter_links:
         # Replace the image src with the local path
         img_tag['src'] = os.path.join('images', img_name)
 
-    
- 
+
     # Remove unwanted <h5> elements
     h5_elements = chapter_soup.find_all('h5')
     for h5 in h5_elements:
@@ -203,9 +199,6 @@ for chapter_link in chapter_links:
     for link in navigation_links:
         link.extract()
 
-
-
-
     # Remove the � symbols
     modified_chapter_content = modified_chapter_content.replace('�', '')
 
@@ -213,7 +206,6 @@ for chapter_link in chapter_links:
     chapter_filename = os.path.join(output_directory, f"{chapter_link['href']}")
     with open(chapter_filename, 'w', encoding='utf-8') as chapter_file:
         chapter_file.write(str(modified_chapter_soup))
-#print(author_name)
 
 # Create an EPUB book open converter2book.py
 print(output_directory)
