@@ -1,6 +1,6 @@
 # Gutenberg2Epub
 
-Gutenberg2Epub ist eine Python-GUI-Anwendung, mit der man [Project Gutenberg-de](https://www.projekt-gutenberg.org) Bücher in das EPUB-E-Book-Format konvertieren kann. Die Anwendung besteht aus mehreren Modulen, die HTML-Inhalte scrapen, verarbeiten und EPUB-E-Books erstellen.
+Gutenberg2Epub ist eine Python-GUI-Anwendung, mit der man [Projekt Gutenberg-de](https://www.projekt-gutenberg.org) Bücher in das EPUB-E-Book-Format konvertieren kann. Die Anwendung besteht aus mehreren Modulen, die HTML-Inhalte scrapen, verarbeiten und EPUB-E-Books erstellen.
 
 ## Erste Schritte
 
