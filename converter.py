@@ -240,25 +240,25 @@ def convert_to_epub(html_directory):
     epub_file = os.path.join(epub_directory, book_title + '.epub')
     epub.write_epub(epub_file, book, {})
 
-    # if os.path.exists(html_directory):
-    #     # Remove all files and subdirectories within the directory
-    #     for item in os.listdir(html_directory):
-    #         item_path = os.path.join(html_directory, item)
-    #         if os.path.isfile(item_path):
-    #             os.remove(item_path)  # Remove files
-    #         elif os.path.isdir(item_path):
-    #             # Recursively remove subdirectories and their contents
-    #             for root, dirs, files in os.walk(item_path, topdown=False):
-    #                 for file in files:
-    #                     os.remove(os.path.join(root, file))
-    #                 for dir in dirs:
-    #                     os.rmdir(os.path.join(root, dir))
-    #             os.rmdir(item_path)  # Remove subdirectory itself
+    if os.path.exists(html_directory):
+        # Remove all files and subdirectories within the directory
+        for item in os.listdir(html_directory):
+            item_path = os.path.join(html_directory, item)
+            if os.path.isfile(item_path):
+                os.remove(item_path)  # Remove files
+            elif os.path.isdir(item_path):
+                # Recursively remove subdirectories and their contents
+                for root, dirs, files in os.walk(item_path, topdown=False):
+                    for file in files:
+                        os.remove(os.path.join(root, file))
+                    for dir in dirs:
+                        os.rmdir(os.path.join(root, dir))
+                os.rmdir(item_path)  # Remove subdirectory itself
 
-    #     # Once the directory is empty, remove it
-    #     os.rmdir(html_directory)
-    # else:
-    #     print(f"The directory '{html_directory}' does not exist.")
+        # Once the directory is empty, remove it
+        os.rmdir(html_directory)
+    else:
+        print(f"The directory '{html_directory}' does not exist.")
 
 
     print("EPUB conversion completed.")
