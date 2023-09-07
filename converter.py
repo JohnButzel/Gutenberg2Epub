@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 import imghdr
 import re
 import shutil
+import argparse
+
 
 def extract_metadata(soup, name, http_equiv=False):
     try:
@@ -121,7 +123,7 @@ def convert_to_epub(html_directory):
     # List all files in the folder
     file_list = os.listdir(epub_image_dir)
 
-    iscover = False  # Initialize the flag
+    iscover = False
 
     for filename in file_list:
         if re.match(pattern, filename):
@@ -138,8 +140,6 @@ def convert_to_epub(html_directory):
             iscover = True
             if not os.path.exists(new_path):
              shutil.copy2(old_path, new_path)
-
-
 
 
     # Iterate through the table of contents and add pages to the EPUB book
@@ -201,6 +201,23 @@ def convert_to_epub(html_directory):
     book.add_item(epub.EpubNcx())
     book.add_item(epub.EpubNav())
 
+    if args.addcover:
+        cover = args.addcover
+        _, extension = os.path.splitext(cover)
+        new_filename = 'cover' + extension
+        new_path = os.path.join(cover_directory, new_filename)
+        old_path = os.path.join(cover_directory, cover)
+        
+        if not os.path.exists(new_path):
+            shutil.copy2(old_path, new_path)
+            print("Cover copied successfully") 
+            iscover = False
+        
+        else:
+            print("Cover already exists in the temp folder")
+
+
+
     cover_image_formats = ['jpg', 'jpeg', 'png']  # Supported image formats
     for image_format in cover_image_formats:
         cover_path = os.path.join(cover_directory, f'cover.{image_format}')
@@ -223,34 +240,35 @@ def convert_to_epub(html_directory):
     epub_file = os.path.join(epub_directory, book_title + '.epub')
     epub.write_epub(epub_file, book, {})
 
-    if os.path.exists(html_directory):
-        # Remove all files and subdirectories within the directory
-        for item in os.listdir(html_directory):
-            item_path = os.path.join(html_directory, item)
-            if os.path.isfile(item_path):
-                os.remove(item_path)  # Remove files
-            elif os.path.isdir(item_path):
-                # Recursively remove subdirectories and their contents
-                for root, dirs, files in os.walk(item_path, topdown=False):
-                    for file in files:
-                        os.remove(os.path.join(root, file))
-                    for dir in dirs:
-                        os.rmdir(os.path.join(root, dir))
-                os.rmdir(item_path)  # Remove subdirectory itself
+    # if os.path.exists(html_directory):
+    #     # Remove all files and subdirectories within the directory
+    #     for item in os.listdir(html_directory):
+    #         item_path = os.path.join(html_directory, item)
+    #         if os.path.isfile(item_path):
+    #             os.remove(item_path)  # Remove files
+    #         elif os.path.isdir(item_path):
+    #             # Recursively remove subdirectories and their contents
+    #             for root, dirs, files in os.walk(item_path, topdown=False):
+    #                 for file in files:
+    #                     os.remove(os.path.join(root, file))
+    #                 for dir in dirs:
+    #                     os.rmdir(os.path.join(root, dir))
+    #             os.rmdir(item_path)  # Remove subdirectory itself
 
-        # Once the directory is empty, remove it
-        os.rmdir(html_directory)
-    else:
-        print(f"The directory '{html_directory}' does not exist.")
+    #     # Once the directory is empty, remove it
+    #     os.rmdir(html_directory)
+    # else:
+    #     print(f"The directory '{html_directory}' does not exist.")
 
 
     print("EPUB conversion completed.")
     print(f"EPUB file saved to '{epub_directory}'.")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python html_to_epub_converter.py <html_directory>")
-        sys.exit(1)
-    
-    html_directory = sys.argv[1]
+    parser = argparse.ArgumentParser(description="Convertrt html to epub")
+    parser.add_argument("--addcover", help="Path to cover image")
+    parser.add_argument("-d", "--output-dir", default="output", help="Directory to save the output")
+    args = parser.parse_args()
+        
+    html_directory = args.output_dir
     convert_to_epub(html_directory)
