@@ -85,7 +85,7 @@ unwanted_links = soup.find_all('a', href=pattern)
 for unwanted_link in unwanted_links:
     unwanted_link.replace_with(unwanted_link.text)  # Replace the link with its text content
 
-
+#kommentar
 
 #Speichere index.html
 index_filename = os.path.join(output_directory, 'index.html')
