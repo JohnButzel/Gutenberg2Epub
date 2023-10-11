@@ -171,7 +171,7 @@ for chapter_link in chapter_links:
     modified_chapter_soup = BeautifulSoup(modified_chapter_content, 'html.parser')
     
     # Remove unwanted elements based on classes as before
-    classes_to_remove = ['dropdown', 'main-nav', 'mainnav', 'top', 'center', 'bottomnavi-gb']
+    classes_to_remove = ['dropdown', 'main-nav', 'mainnav', 'top', 'bottomnavi-gb']
     for class_to_remove in classes_to_remove:
         elements_to_remove = modified_chapter_soup.find_all(class_=class_to_remove)
         for element in elements_to_remove:
@@ -194,6 +194,10 @@ for chapter_link in chapter_links:
     for element in elements_to_remove:
         element.extract()
 
+    #remove href="/info/texte/index.html
+    elements_to_remove = modified_chapter_soup.find_all('a', {'href': '/info/texte/index.html'})
+    for element in elements_to_remove:
+        element.extract()
     # Remove the navigation links for previous and next chapters
     navigation_links = modified_chapter_soup.find_all('a', {'href': re.compile(r'^chap\d+.html')})
     for link in navigation_links:
@@ -201,6 +205,11 @@ for chapter_link in chapter_links:
 
     # Remove the � symbols
     modified_chapter_content = modified_chapter_content.replace('�', '')
+    
+    # Find all empty tags
+    empty_tags = modified_chapter_soup.find_all(lambda tag: not tag.contents and (tag.string is None or len(tag.string.strip()) == 0))
+    for empty_tag in empty_tags:
+        empty_tag.extract()
 
     # Save the chapter as a separate HTML file
     chapter_filename = os.path.join(output_directory, f"{chapter_link['href']}")
