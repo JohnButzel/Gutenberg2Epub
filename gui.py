@@ -36,6 +36,10 @@ class MyFrame2(wx.Frame):
         self.add_cover_button = wx.Button(self.panel, wx.ID_ANY, u"Titelbild hinzufügen", wx.DefaultPosition, wx.DefaultSize, 0)
         bSizer2.Add(self.add_cover_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL , 5)
 
+        # Add a checkbox to include or exclude the cover image
+        self.include_cover_checkbox = wx.CheckBox(self.panel, wx.ID_ANY, u"Titelbild von der Titelseite entfernen", wx.DefaultPosition, wx.DefaultSize, 0)
+        bSizer1.Add(self.include_cover_checkbox, 0, wx.ALL | wx.EXPAND, 5)
+
         self.m_button1 = wx.Button(self.panel, wx.ID_ANY, u"Buch laden", wx.DefaultPosition, wx.DefaultSize, 0)
         bSizer2.Add(self.m_button1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL , 5)
 
@@ -53,6 +57,8 @@ class MyFrame2(wx.Frame):
         self.m_button1.Bind(wx.EVT_BUTTON, self.on_load_book_button)
         self.add_cover_button.Bind(wx.EVT_BUTTON, self.on_add_cover_button)
         self.cover_image_path = None
+        
+
 
 
     def on_load_book_button(self, event):
@@ -82,7 +88,6 @@ class MyFrame2(wx.Frame):
             return
 
         self.cover_image_path = openFileDialog.GetPath()
-
 
 
     def run_scraping(self, url, output_directory):
@@ -143,9 +148,9 @@ class MyFrame2(wx.Frame):
             elif exe == False:      
                 test_script_path = os.path.join(bundle_dir, "converter.py")
                 if self.cover_image_path:
-                    subprocess.run(["python", test_script_path, "-d", output_directory, "--addcover", self.cover_image_path])
+                    subprocess.run(["python", test_script_path, "-d", output_directory, "--addcover", self.cover_image_path, "--includecover", str(self.include_cover_checkbox.GetValue())])
                 else:
-                    subprocess.run(["python", test_script_path, "-d", output_directory])
+                    subprocess.run(["python", test_script_path, "-d", output_directory,"--includecover", str(self.include_cover_checkbox.GetValue())])
             
             wx.CallAfter(self.show_conversion_complete_message)
         
