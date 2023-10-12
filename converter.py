@@ -94,7 +94,7 @@ def convert_to_epub(html_directory):
     book.add_metadata('DC', 'subject', book_genre)
     book.add_metadata('DC', 'contributor', book_translator)
 
-    if args.includecover == True:
+    if args.deletedecover:
         titelpage_path = os.path.join(html_directory, 'titlepage.html')
         try:
             with open(titelpage_path, 'r', encoding='utf-8') as titelpage_file:
@@ -303,7 +303,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convertrt html to epub")
     parser.add_argument("--addcover", help="Path to cover image")
     parser.add_argument("-d", "--output-dir", default="output", help="Directory to save the output")
-    parser.add_argument("--includecover", default=False, help="Include cover image in the epub")
+    parser.add_argument("--deletedecover", type=lambda x: x.lower() == 'true', default=False, help="Remove cover image from the titelpage.")
     args = parser.parse_args()
         
     html_directory = args.output_dir

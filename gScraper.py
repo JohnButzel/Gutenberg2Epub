@@ -206,15 +206,17 @@ for chapter_link in chapter_links:
     # Remove the � symbols
     modified_chapter_content = modified_chapter_content.replace('�', '')
     
-    # Find all empty tags
-    empty_tags = modified_chapter_soup.find_all(lambda tag: not tag.contents and (tag.string is None or len(tag.string.strip()) == 0))
+    # Find all empty table and paragraph tags
+    empty_tags = modified_chapter_soup.find_all (lambda tag: tag.name in ['table', 'p'] and not tag.contents)
+    # Remove the empty tags from the soup object
     for empty_tag in empty_tags:
-        empty_tag.extract()
-
+        empty_tag.decompose ()
+    
+    
     # Save the chapter as a separate HTML file
     chapter_filename = os.path.join(output_directory, f"{chapter_link['href']}")
     with open(chapter_filename, 'w', encoding='utf-8') as chapter_file:
-        chapter_file.write(str(modified_chapter_soup))
+        chapter_file.write(str(modified_chapter_soup.prettify()))
 
 # Create an EPUB book open converter2book.py
 print(output_directory)

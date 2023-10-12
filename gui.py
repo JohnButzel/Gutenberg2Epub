@@ -141,16 +141,16 @@ class MyFrame2(wx.Frame):
             if exe == True:
                 test_script_path = os.path.join(bundle_dir, "converter.exe")
                 if self.cover_image_path:
-                    subprocess.run([test_script_path, "-d", output_directory, "--addcover", self.cover_image_path])
+                    subprocess.run([test_script_path, "-d", output_directory, "--addcover", self.cover_image_path,"--deletedecover", str(self.include_cover_checkbox.GetValue())])
                 else:
-                    subprocess.run([test_script_path, "-d", output_directory])
+                    subprocess.run([test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue())])
 
             elif exe == False:      
                 test_script_path = os.path.join(bundle_dir, "converter.py")
                 if self.cover_image_path:
-                    subprocess.run(["python", test_script_path, "-d", output_directory, "--addcover", self.cover_image_path, "--includecover", str(self.include_cover_checkbox.GetValue())])
+                    subprocess.run(["python", test_script_path, "-d", output_directory, "--addcover", self.cover_image_path, "--deletedecover", str(self.include_cover_checkbox.GetValue())])
                 else:
-                    subprocess.run(["python", test_script_path, "-d", output_directory,"--includecover", str(self.include_cover_checkbox.GetValue())])
+                    subprocess.run(["python", test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue())])
             
             wx.CallAfter(self.show_conversion_complete_message)
         
