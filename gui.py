@@ -110,7 +110,7 @@ class MyFrame2(wx.Frame):
                 result = subprocess.run(["python", "gscraper.py", url, "-d", output_directory], capture_output=True, text=True)
 
             output_directory = result.stdout.strip()
-
+            print(output_directory)
             # Check if the scraping process was successful
             if result.returncode == 0:
                 # Run the ebook conversion process using a thread
