@@ -145,19 +145,20 @@ def find_and_process_chapters(url, output_directory, author_name, book_title, so
 
         return chapter_soup
 
-    for chapter_link in chapter_links:
-        chapter_url = urljoin(url, chapter_link['href'])
-        chapter_response = requests.get(chapter_url)
-        chapter_response.encoding = 'utf-8'
-        chapter_content = chapter_response.text
-        chapter_soup = BeautifulSoup(chapter_content, 'html.parser')
+    with requests.Session() as session:
+        for chapter_link in chapter_links:
+            chapter_url = urljoin(url, chapter_link['href'])
+            chapter_response = requests.get(chapter_url)
+            chapter_response.encoding = 'utf-8'
+            chapter_content = chapter_response.text
+            chapter_soup = BeautifulSoup(chapter_content, 'html.parser')
 
-        chapter_soup = modify_chapter_content(chapter_soup)
+            chapter_soup = modify_chapter_content(chapter_soup)
 
-        # Save the chapter as a separate HTML file
-        chapter_filename = os.path.join(output_directory, chapter_link['href'])
-        with open(chapter_filename, 'w', encoding='utf-8') as chapter_file:
-            chapter_file.write(str(chapter_soup.prettify()))
+            # Save the chapter as a separate HTML file
+            chapter_filename = os.path.join(output_directory, chapter_link['href'])
+            with open(chapter_filename, 'w', encoding='utf-8') as chapter_file:
+                chapter_file.write(str(chapter_soup.prettify()))
 
 
 def main():
