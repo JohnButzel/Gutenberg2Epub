@@ -66,7 +66,16 @@ class MyFrame2(wx.Frame):
         self.add_cover_button.Disable()
         url = self.m_textCtrl1.GetValue()
         output_directory = self.output_dir_picker.GetPath()  # Get the selected output directory
-
+        
+        #Check Internet Connection
+        try:
+            subprocess.run(["ping", "www.projekt-gutenberg.org", "-n", "1"], check=True)
+        except subprocess.CalledProcessError as e:
+            show_error_message("Keine Internetverbindung! Bitte stellen Sie sicher, dass Sie mit dem Internet verbunden sind.", "Error")
+            self.m_button1.Enable()
+            self.add_cover_button.Enable()
+            return
+        
         # Validate the URL pattern
         valid_url_pattern = r'https://www\.projekt-gutenberg\.org/.+/.+/'
         if not re.match(valid_url_pattern, url):
