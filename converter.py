@@ -94,6 +94,26 @@ def convert_to_epub(html_directory):
     book.add_metadata('DC', 'subject', book_genre)
     book.add_metadata('DC', 'contributor', book_translator)
 
+    if args.deletedecover:
+        titelpage_path = os.path.join(html_directory, 'titlepage.html')
+        try:
+            with open(titelpage_path, 'r', encoding='utf-8') as titelpage_file:
+                titelpage_content = titelpage_file.read()
+                titel_soup = BeautifulSoup(titelpage_content, 'html.parser')
+                
+                covertoremove = titel_soup.find_all('img', src=lambda src: src and 'cover' in src)
+                for cover in covertoremove:
+                    cover.decompose()
+            
+            # Now, write the modified content back to the same HTML file
+            with open(titelpage_path, 'w', encoding='utf-8') as titelpage_file:
+                titelpage_file.write(str(titel_soup))
+        except FileNotFoundError as e:
+            print(f"Error: {e} - The HTML file '{titelpage_path}' was not found.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+
+        
     # Initialize the image directory path
     image_dir = os.path.join(html_directory)
 
@@ -283,6 +303,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convertrt html to epub")
     parser.add_argument("--addcover", help="Path to cover image")
     parser.add_argument("-d", "--output-dir", default="output", help="Directory to save the output")
+    parser.add_argument("--deletedecover", type=lambda x: x.lower() == 'true', default=False, help="Remove cover image from the titelpage.")
     args = parser.parse_args()
         
     html_directory = args.output_dir

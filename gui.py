@@ -36,6 +36,10 @@ class MyFrame2(wx.Frame):
         self.add_cover_button = wx.Button(self.panel, wx.ID_ANY, u"Titelbild hinzufügen", wx.DefaultPosition, wx.DefaultSize, 0)
         bSizer2.Add(self.add_cover_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL , 5)
 
+        # Add a checkbox to include or exclude the cover image
+        self.include_cover_checkbox = wx.CheckBox(self.panel, wx.ID_ANY, u"Titelbild von der Titelseite entfernen", wx.DefaultPosition, wx.DefaultSize, 0)
+        bSizer1.Add(self.include_cover_checkbox, 0, wx.ALL | wx.EXPAND, 5)
+
         self.m_button1 = wx.Button(self.panel, wx.ID_ANY, u"Buch laden", wx.DefaultPosition, wx.DefaultSize, 0)
         bSizer2.Add(self.m_button1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL , 5)
 
@@ -53,6 +57,8 @@ class MyFrame2(wx.Frame):
         self.m_button1.Bind(wx.EVT_BUTTON, self.on_load_book_button)
         self.add_cover_button.Bind(wx.EVT_BUTTON, self.on_add_cover_button)
         self.cover_image_path = None
+        
+
 
 
     def on_load_book_button(self, event):
@@ -60,7 +66,16 @@ class MyFrame2(wx.Frame):
         self.add_cover_button.Disable()
         url = self.m_textCtrl1.GetValue()
         output_directory = self.output_dir_picker.GetPath()  # Get the selected output directory
-
+        
+        #Check Internet Connection
+        try:
+            subprocess.run(["ping", "www.projekt-gutenberg.org", "-n", "1"], check=True)
+        except subprocess.CalledProcessError as e:
+            show_error_message("Keine Internetverbindung! Bitte stellen Sie sicher, dass Sie mit dem Internet verbunden sind.", "Error")
+            self.m_button1.Enable()
+            self.add_cover_button.Enable()
+            return
+        
         # Validate the URL pattern
         valid_url_pattern = r'https://www\.projekt-gutenberg\.org/.+/.+/'
         if not re.match(valid_url_pattern, url):
@@ -84,7 +99,6 @@ class MyFrame2(wx.Frame):
         self.cover_image_path = openFileDialog.GetPath()
 
 
-
     def run_scraping(self, url, output_directory):
         try:
 
@@ -105,7 +119,7 @@ class MyFrame2(wx.Frame):
                 result = subprocess.run(["python", "gscraper.py", url, "-d", output_directory], capture_output=True, text=True)
 
             output_directory = result.stdout.strip()
-
+            print(output_directory)
             # Check if the scraping process was successful
             if result.returncode == 0:
                 # Run the ebook conversion process using a thread
@@ -136,16 +150,16 @@ class MyFrame2(wx.Frame):
             if exe == True:
                 test_script_path = os.path.join(bundle_dir, "converter.exe")
                 if self.cover_image_path:
-                    subprocess.run([test_script_path, "-d", output_directory, "--addcover", self.cover_image_path])
+                    subprocess.run([test_script_path, "-d", output_directory, "--addcover", self.cover_image_path,"--deletedecover", str(self.include_cover_checkbox.GetValue())])
                 else:
-                    subprocess.run([test_script_path, "-d", output_directory])
+                    subprocess.run([test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue())])
 
             elif exe == False:      
                 test_script_path = os.path.join(bundle_dir, "converter.py")
                 if self.cover_image_path:
-                    subprocess.run(["python", test_script_path, "-d", output_directory, "--addcover", self.cover_image_path])
+                    subprocess.run(["python", test_script_path, "-d", output_directory, "--addcover", self.cover_image_path, "--deletedecover", str(self.include_cover_checkbox.GetValue())])
                 else:
-                    subprocess.run(["python", test_script_path, "-d", output_directory])
+                    subprocess.run(["python", test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue())])
             
             wx.CallAfter(self.show_conversion_complete_message)
         

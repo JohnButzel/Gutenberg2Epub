@@ -14,24 +14,49 @@ Gutenberg2Epub ist eine Python-GUI-Anwendung, mit der man [Projekt Gutenberg-de]
 3. Klicke auf die Schaltfläche "Buch laden", um den Konvertierungsprozess zu starten.
 4. Eine Nachricht wird angezeigt, die auf die erfolgreiche Konvertierung des E-Books hinweist.
 
-## Kommandozeilenschnittstelle (CLI)
+## Verwendung der Kommandozeilenschnittstelle (CLI)
 
-Zusätzlich kannst du die Kommandozeilenschnittstelle verwenden, um dasselbe Ergebnis zu erzielen. Hier ist wie:
+Du kannst die Kommandozeilenschnittstelle verwenden, um das Konvertieren von Project Gutenberg-Inhalten durchzuführen. Hier sind die Schritte und Befehle, um dies zu tun:
 
-1. Öffne eine Eingabeaufforderung oder ein Terminal.
-2. Führe den folgenden Befehl aus:
+### Schritte
+
+1. **Öffnen einer Eingabeaufforderung oder eines Terminals**: Starte deine bevorzugte Eingabeaufforderung oder ein Terminal auf deinem Computer.
+
+2. **Ausführen des Befehls**: Verwende den folgenden Befehl, um das Konvertieren zu starten:
+
+### Basisbefehl:
 
 ```bash
 python cli.py <url>
 ```
-oder
+
+### Befehl mit benutzerdefiniertem Ausgabeverzeichnis:
+
 ```bash
-python cli.py <url> -d <Directory>
+python cli.py <url> -o <Verzeichnis>
 ```
+
 Ersetze `<url>` durch die URL des Project Gutenberg-Inhalts, den du konvertieren möchtest.
 
-Ersetze `<Directory>` durch den Pfad, wo das Buch gespeichert werden soll.
+Falls du ein benutzerdefiniertes Ausgabeverzeichnis festlegen möchtest, ersetze `<Verzeichnis>` durch den Pfad, wo das Buch gespeichert werden soll.
 
+### Optionen
+
+- `-o, --output <Verzeichnis>`: Mit dieser Option kannst du das Ausgabeverzeichnis für das konvertierte Buch festlegen. Wenn diese Option nicht angegeben wird, wird das Buch im aktuellen Arbeitsverzeichnis gespeichert.
+
+- `--cover <Pfad zur Titelseitenbild>`: Mit dieser Option kannst du eine Titelseite festlegen, die dem Buch hinzugefügt wird.
+
+- `--delete-cover`: Diese Option entfernt das Titelseitenbild aus der Indexseite, sofern es vorhanden ist.
+
+### Beispielanwendung
+
+Angenommen, du möchtest das Buch von der folgenden Project Gutenberg-URL konvertieren: `https://www.projekt-gutenberg.org/autor/buch/`, und du möchtest das konvertierte Buch im Verzeichnis `/home/dein_benutzername/bücher/` speichern. Du möchtest auch ein benutzerdefiniertes Titelbild hinzufügen und das vorhandene Titelbild aus dem Buch entfernen. Du würdest den folgenden Befehl verwenden:
+
+```bash
+python cli.py https://www.projekt-gutenberg.org/autor/buch/ -o /home/dein_benutzername/bücher/ --cover /pfad/zur/titelseiten-grafik.jpg --delete-cover
+```
+
+Die CLI ermöglicht es dir, das Konvertieren von Project Gutenberg-Büchern bequem über die Kommandozeile durchzuführen, und bietet die Flexibilität, Titelseitenbilder hinzuzufügen oder zu entfernen. Beachte, dass du Python auf deinem Computer installiert haben musst, um diesen Befehl auszuführen.
 ## Installation und Anforderungen
 
 Falls du die ausführbare Datei nicht verwenden möchtest, besteht die Möglichkeit, die Python-Skripte zu verwenden. Zur Ausführung der Python-Skripte benötigst du die folgenden Abhängigkeiten:
