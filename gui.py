@@ -1,3 +1,4 @@
+import requests
 import wx
 import subprocess
 import threading
@@ -64,31 +65,35 @@ class MyFrame2(wx.Frame):
     def on_load_book_button(self, event):
         self.m_button1.Disable()
         self.add_cover_button.Disable()
-        url = self.m_textCtrl1.GetValue()
+        url_or_path = self.m_textCtrl1.GetValue()
         output_directory = self.output_dir_picker.GetPath()  # Get the selected output directory
         
+        if re.match(r'https?://', url_or_path):
         #Check Internet Connection
-        try:
-            subprocess.run(["ping", "www.projekt-gutenberg.org", "-n", "1"], check=True)
-        except subprocess.CalledProcessError as e:
-            show_error_message("Keine Internetverbindung! Bitte stellen Sie sicher, dass Sie mit dem Internet verbunden sind.", "Error")
-            self.m_button1.Enable()
-            self.add_cover_button.Enable()
-            return
-        
-        # Validate the URL pattern
-        valid_url_pattern = r'https://www\.projekt-gutenberg\.org/.+/.+/'
-        if not re.match(valid_url_pattern, url):
-            show_error_message("Ungültiges URL-Format! Bitte geben Sie eine gültige Gutenberg-de-URL ein.", "Error")
-            self.m_button1.Enable()
-            self.add_cover_button.Enable()
-            return
+            try:
+                response = requests.get("https://www.projekt-gutenberg.org", timeout=5)
+                response.raise_for_status()  # Raise an exception for HTTP errors
+            except requests.exceptions.RequestException as e:
+                show_error_message("Keine Internetverbindung! Bitte stellen Sie sicher, dass Sie mit dem Internet verbunden sind.", "Error")
+                self.m_button1.Enable()
+                self.add_cover_button.Enable()
+                return
+            
+            # Validate the URL pattern
+            valid_url_pattern = r'https://www\.projekt-gutenberg\.org/.+/.+/'
+            if not re.match(valid_url_pattern, url_or_path):
+                show_error_message("Ungültiges URL-Format! Bitte geben Sie eine gültige Gutenberg-de-URL ein.", "Error")
+                self.m_button1.Enable()
+                self.add_cover_button.Enable()
+                return
 
-
-
-        # Run the scraping process using a thread
-        scraping_thread = threading.Thread(target=self.run_scraping, args=(url, output_directory))
-        scraping_thread.start()
+             # Run the scraping process using a thread
+            scraping_thread = threading.Thread(target=self.run_scraping, args=(url_or_path, output_directory))
+            scraping_thread.start()
+        else:
+            # The input is a local path, so run localprocess.py
+            processing_thread = threading.Thread(target=self.run_local_process, args=(url_or_path, output_directory))
+            processing_thread.start()
 
     def on_add_cover_button(self, event):
         openFileDialog = wx.FileDialog(self, "Choose a cover image", "", "", "Image files (*.jpg;*.png)|*.jpg;*.png", wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
@@ -132,6 +137,42 @@ class MyFrame2(wx.Frame):
 
         except Exception as e:
             wx.CallAfter(show_error_message, f"An error occurred while scraping the book: {e}", "Error")
+            self.m_button1.Enable()
+            self.add_cover_button.Enable()
+
+    def run_local_process(self, local_path, output_directory):
+        try:
+
+            if getattr(sys, 'frozen', False):
+                # Running as executable
+                bundle_dir = sys._MEIPASS
+                exe = True
+            else:
+                # Running as script
+                bundle_dir = os.path.dirname(os.path.abspath(__file__))
+                exe = False
+
+            gscraper_script_path = os.path.join(bundle_dir, "localprocess.exe")
+
+            if exe == True:
+                result = subprocess.run([gscraper_script_path, local_path, "-d", output_directory], capture_output=True, text=True)
+            elif exe == False:      
+                result = subprocess.run(["python", "localprocess.py", local_path, "-d", output_directory], capture_output=True, text=True)
+
+            output_directory = result.stdout.strip()
+            print(output_directory)
+            # Check if the scraping process was successful
+            if result.returncode == 0:
+                # Run the ebook conversion process using a thread
+                conversion_thread = threading.Thread(target=self.run_conversion, args=(output_directory,))
+                conversion_thread.start()
+            else:
+                wx.CallAfter(show_error_message, f"Scraping the book failed: {result.stderr}", "Error")
+                self.m_button1.Enable()
+                self.add_cover_button.Enable()
+
+        except Exception as e:
+            wx.CallAfter(show_error_message, f"An error occurred while processing the book: {e}", "Error")
             self.m_button1.Enable()
             self.add_cover_button.Enable()
 
