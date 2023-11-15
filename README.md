@@ -27,13 +27,13 @@ Du kannst die Kommandozeilenschnittstelle verwenden, um das Konvertieren von Pro
 ### Basisbefehl:
 
 ```bash
-python cli.py <url>
+python Gutenberg2Epub_cli.py <url>
 ```
 
 ### Befehl mit benutzerdefiniertem Ausgabeverzeichnis:
 
 ```bash
-python cli.py <url> -o <Verzeichnis>
+python Gutenberg2Epub_cli.py <url> -o <Verzeichnis>
 ```
 
 Ersetze `<url>` durch die URL des Project Gutenberg-Inhalts, den du konvertieren möchtest.
@@ -53,7 +53,7 @@ Falls du ein benutzerdefiniertes Ausgabeverzeichnis festlegen möchtest, ersetze
 Angenommen, du möchtest das Buch von der folgenden Project Gutenberg-URL konvertieren: `https://www.projekt-gutenberg.org/autor/buch/`, und du möchtest das konvertierte Buch im Verzeichnis `/home/dein_benutzername/bücher/` speichern. Du möchtest auch ein benutzerdefiniertes Titelbild hinzufügen und das vorhandene Titelbild aus dem Buch entfernen. Du würdest den folgenden Befehl verwenden:
 
 ```bash
-python cli.py https://www.projekt-gutenberg.org/autor/buch/ -o /home/dein_benutzername/bücher/ --cover /pfad/zur/titelseiten-grafik.jpg --delete-cover
+python Gutenberg2Epub_cli.py https://www.projekt-gutenberg.org/autor/buch/ -o /home/dein_benutzername/bücher/ --cover /pfad/zum/cover.png --delete-cover
 ```
 
 Die CLI ermöglicht es dir, das Konvertieren von Project Gutenberg-Büchern bequem über die Kommandozeile durchzuführen, und bietet die Flexibilität, Titelseitenbilder hinzuzufügen oder zu entfernen. Beachte, dass du Python auf deinem Computer installiert haben musst, um diesen Befehl auszuführen.
@@ -88,7 +88,7 @@ Das Gutenberg Scraper-Modul ist dafür verantwortlich, den HTML-Inhalt von der a
 
 Das HTML zu EPUB Converter-Modul nimmt den abgerufenen HTML-Inhalt und die Ressourcen und konvertiert sie in ein EPUB-E-Book. Es extrahiert Metadaten, erstellt ein Inhaltsverzeichnis und generiert die EPUB-Datei.
 
-### Kommandozeilenschnittstelle (cli.py)
+### Kommandozeilenschnittstelle (Gutenberg2Epub_cli.py)
 
 Das Modul für die Kommandozeilenschnittstelle bietet eine einfache Kommandozeilenschnittstelle, um den gesamten Konvertierungsprozess auszuführen. Es nimmt die URL als Argument und automatisiert den Abruf und Konvertierungsprozess.
 
