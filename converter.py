@@ -279,18 +279,19 @@ def convert_to_epub(html_directory):
         os.rmdir(html_directory)
     else:
         print(f"The directory '{html_directory}' does not exist.")
+    
     #remove the cover from the temp folder
-    try:
-        os.remove(new_path)
-        print(f"File '{new_path}' removed successfully.")
-    except Exception as e:
+    if args.addcover:
         try:
-                os.chmod(new_path, 0o755)
-                os.remove(new_path)
-                print("NONONONONONO")
-        except OSError:
-            print(f"Unable to remove file '{new_path}'.")
-            print(f"Error: {e}")
+            os.remove(new_path)
+            print(f"File '{new_path}' removed successfully.")
+        except Exception as e:
+            try:
+                    os.chmod(new_path, 0o755)
+                    os.remove(new_path)
+            except OSError:
+                print(f"Unable to remove file '{new_path}'.")
+                print(f"Error: {e}")
 
 
 
