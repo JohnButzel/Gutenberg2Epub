@@ -6,6 +6,8 @@ import imghdr
 import re
 import shutil
 import argparse
+from html import unescape  # Import the unescape function from the html module
+
 
 
 def extract_metadata(soup, name, http_equiv=False):
@@ -121,11 +123,22 @@ def convert_to_epub(html_directory):
     epub_image_dir = os.path.join(html_directory, 'images')
     os.makedirs(epub_image_dir, exist_ok=True)
 
-    # # Add the CSS file to the EPUB book's resources
-    # css_path = os.path.join(html_directory, 'css', 'prosa.css')
-    # css_id = 'prosa-css'
-    # book.add_item(epub.EpubItem(uid=css_id, file_name=css_path, media_type='text/css', content=open(css_path).read()))
+    if not args.remove_css:
+        # Add the CSS file to the EPUB book's resources
+        css_path = os.path.join(html_directory, 'css', 'prosa.css')
+        css_id = 'prosa-css'
+        # Read the content of the CSS file
+        try:
+            with open(css_path, 'r', encoding='utf-8') as css_file:
+                css_content = css_file.read()
+        except FileNotFoundError as e:
+            print(f"Error: {e} - The CSS file '{css_path}' was not found.")        
 
+        # Create an EPUB item for the CSS
+        style = epub.EpubItem(uid=css_id, file_name='css/prosa.css', media_type='text/css', content=css_content)
+        # Add the CSS item to the book
+        book.add_item(style)
+    
     # Find the table of contents list
     toc_list = index_soup.find('h3', string='Inhaltsverzeichnis').find_next('ul')
     toc_items = toc_list.find_all('a', href=True)
@@ -161,6 +174,20 @@ def convert_to_epub(html_directory):
             if not os.path.exists(new_path):
              shutil.copy2(old_path, new_path)
 
+    if args.popup_footnotes:
+        total_footnote_count = 1  # Initialize the total footnote count
+        # Create a new EpubHtml object for the combined footnote page
+        footnotes_page = epub.EpubHtml(title='Footnotes', file_name='footnotes.xhtml', lang='en')
+        # Construct the content of the footnotes page
+        footnotes_content = '''
+        <!DOCTYPE html>
+        <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+        <head>
+            <title>Footnotes</title>
+        </head>
+        <body>
+            <h1>Fußnoten</h1>
+        '''
 
     # Iterate through the table of contents and add pages to the EPUB book
     for toc_item in toc_items:
@@ -179,6 +206,11 @@ def convert_to_epub(html_directory):
         # Create a new EPUB item for the page
         page_id = page_href.replace('.html', '')  # Use page filename as ID
         page = epub.EpubHtml(title=page_title, file_name=page_href)
+        
+        if not args.remove_css:
+            #add css
+            page.add_link(href='css/prosa.css', rel='stylesheet', type='text/css')
+        
         # Handle images
         img_tags = page_soup.find_all('img')
         for img_tag in img_tags:
@@ -198,6 +230,53 @@ def convert_to_epub(html_directory):
 
         # Update the modified page content in the EpubHtml object
         page.content = str(page_soup)
+        
+        if args.popup_footnotes:
+            # Create a list to store all footnote content
+            all_footnotes_content = []
+
+            # Iterate through footnotes and append them to the list
+            for index, footnote in enumerate(page_soup.find_all('span', {'class': 'footnote'}), start=0):
+                footnote_text = unescape(footnote.get_text(strip=True))
+                all_footnotes_content.append(footnote_text)
+
+                # Replace the existing footnote span with the new reference format
+                footnote_ref_tag = page_soup.new_tag('sup')
+                footnote_link_tag = page_soup.new_tag('a')
+                footnote_link_tag['id'] = f'footnote_{index + total_footnote_count}'
+                footnote_link_tag['href'] = f'footnotes.xhtml#footnote_{index +total_footnote_count}'
+                footnote_link_tag['epub:type'] = 'noteref'
+                footnote_link_tag.string = str(index + total_footnote_count)
+                footnote_ref_tag.append(footnote_link_tag)
+
+                # Write each footnote content to footnotes.xhtml
+                footnotes_content += f'''
+                <aside epub:type="footnote" id="footnote_{index + total_footnote_count}">
+                    <p><a epub:type="noteref" href="{page_href}#footnote_{index + total_footnote_count}">{index + total_footnote_count}.</a> {footnote_text}</p>
+                </aside>
+            '''
+
+                # Replace the existing footnote span with the new reference format
+                footnote.replace_with(footnote_ref_tag)
+
+            # Now, update the links in the main content to refer to the combined footnote page
+            # Iterate through the main content and update the references
+            for index, _ in enumerate(all_footnotes_content, start=1):
+                footnote_ref_tag = page_soup.new_tag('sup')
+                footnote_link_tag = page_soup.new_tag('a')
+                footnote_link_tag['href'] = f'footnotes.xhtml#footnote_{total_footnote_count}'
+                footnote_link_tag['id'] = f'footnote_{total_footnote_count}'
+                footnote_link_tag['epub:type'] = 'noteref'
+                footnote_link_tag.string = str(total_footnote_count)
+                footnote_ref_tag.append(footnote_link_tag)
+                total_footnote_count += 1
+                # Replace the footnote content in the main text with the reference link
+                footnote_pattern = re.compile(rf'<span class="footnote">.*?{re.escape(footnote_text)}.*?</span>')
+                match = re.search(footnote_pattern, page_content)
+                if match:
+                    page_content = re.sub(footnote_pattern, str(footnote_ref_tag), page_content)
+            # Update the modified page content in the EpubHtml object
+            page.content = str(page_soup)
 
         # Add page to the book
         book.add_item(page)
@@ -211,16 +290,31 @@ def convert_to_epub(html_directory):
         # Add page to the spine
         spine.append(page_href)  # Add a page entry to the spine
 
-    # Add the table of contents to the book
-    book.toc = toc
+        # Add the table of contents to the book
+        book.toc = toc
 
-    # Add the spine (order of contents)
-    book.spine = spine
 
-    # Add the default NCX and Nav file
-    book.add_item(epub.EpubNcx())
-    book.add_item(epub.EpubNav())
+        # Add the spine (order of contents)
+        book.spine = spine
+        
+    if args.popup_footnotes:
+        # Add the default NCX and Nav file
+        book.add_item(epub.EpubNcx())
+        book.add_item(epub.EpubNav())
+        footnotes_content += '''
+        </body>
+        </html>
+        '''
+        
+        # Set the content for the footnotes page
+        footnotes_page = epub.EpubHtml(title='Footnotes', file_name='footnotes.xhtml', lang='en')
+        footnotes_page.content = footnotes_content
 
+        # Add the footnotes page to the book
+        book.add_item(footnotes_page)
+        #Add the footnotes page to the spine at the end
+        book.spine.append(footnotes_page)
+    
     if args.addcover:
         cover = args.addcover
         _, extension = os.path.splitext(cover)
@@ -244,13 +338,11 @@ def convert_to_epub(html_directory):
 
         if os.path.exists(cover_path):
             iscover = False
-            print("toootooot")
 
     # Add cover image if it exists and set it as the cover and the first page
     add_cover_image_and_first_page(book, cover_directory)
 
     if iscover == True:
-        print("saaaaaaaaaaasa")
         add_cover_image_and_first_page(book, epub_image_dir)
 
                 
@@ -305,6 +397,8 @@ if __name__ == "__main__":
     parser.add_argument("--addcover", help="Path to cover image")
     parser.add_argument("-d", "--output-dir", default="output", help="Directory to save the output")
     parser.add_argument("--deletedecover", type=lambda x: x.lower() == 'true', default=False, help="Remove cover image from the titelpage.")
+    parser.add_argument("--remove-css", "--css", type=lambda x: x.lower() == 'true' , default=False, help="Exclude CSS file in the EPUB.")
+    parser.add_argument("--popup-footnotes", type=lambda x: x.lower() == 'true', default=True, help="Convert footnotes to popup footnotes.")
     args = parser.parse_args()
         
     html_directory = args.output_dir

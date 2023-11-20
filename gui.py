@@ -16,40 +16,51 @@ class MyFrame2(wx.Frame):
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=u"Gutenberg2epub", pos=wx.DefaultPosition, size=wx.Size(500, 300), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
 
         self.panel = wx.Panel(self)
-
-        bSizer1 = wx.BoxSizer(wx.VERTICAL)
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
 
         self.m_staticText1 = wx.StaticText(self.panel, wx.ID_ANY, u"Gutenberg2Epub", wx.DefaultPosition, wx.DefaultSize, 0)
-        bSizer1.Add(self.m_staticText1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
+        mainSizer.Add(self.m_staticText1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL, 5)
 
         self.m_textCtrl1 = wx.TextCtrl(self.panel, wx.ID_ANY, pos=wx.DefaultPosition, size=wx.DefaultSize, style=wx.TE_PROCESS_ENTER)
         self.m_textCtrl1.SetHint(u"URL Eingeben")  # Set the placeholder text
-        bSizer1.Add(self.m_textCtrl1, 0, wx.ALL | wx.EXPAND, 5)
+        mainSizer.Add(self.m_textCtrl1, 0, wx.ALL | wx.EXPAND, 5)
 
-        current_directory = os.path.join(os.getcwd(), "output")  # Get the current directory
+        current_directory = os.path.join(os.getcwd(), "output")
         self.output_dir_picker = wx.DirPickerCtrl(self.panel, wx.ID_ANY, path=current_directory, style=wx.DIRP_DEFAULT_STYLE | wx.DIRP_USE_TEXTCTRL)
-        bSizer1.Add(self.output_dir_picker, 0, wx.ALL | wx.EXPAND, 5)
+        mainSizer.Add(self.output_dir_picker, 0, wx.ALL | wx.EXPAND, 5)
 
-        # Create a horizontal box sizer for the buttons
-        bSizer2 = wx.BoxSizer(wx.HORIZONTAL)
+        # Create a horizontal box sizer for the "Titelbild hinzufügen" and "Buch laden" buttons
+        buttonSizer = wx.BoxSizer(wx.HORIZONTAL)
         
-         # Add a "Add Cover" button
         self.add_cover_button = wx.Button(self.panel, wx.ID_ANY, u"Titelbild hinzufügen", wx.DefaultPosition, wx.DefaultSize, 0)
-        bSizer2.Add(self.add_cover_button, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL , 5)
-
-        # Add a checkbox to include or exclude the cover image
-        self.include_cover_checkbox = wx.CheckBox(self.panel, wx.ID_ANY, u"Titelbild von der Titelseite entfernen", wx.DefaultPosition, wx.DefaultSize, 0)
-        bSizer1.Add(self.include_cover_checkbox, 0, wx.ALL | wx.EXPAND, 5)
+        buttonSizer.Add(self.add_cover_button, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
 
         self.m_button1 = wx.Button(self.panel, wx.ID_ANY, u"Buch laden", wx.DefaultPosition, wx.DefaultSize, 0)
-        bSizer2.Add(self.m_button1, 0, wx.ALL | wx.ALIGN_CENTER_HORIZONTAL | wx.ALIGN_CENTER_VERTICAL , 5)
+        buttonSizer.Add(self.m_button1, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
+
+        mainSizer.Add(buttonSizer, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, 5)
+
+        # Create the collapsible pane for "Advanced Options"
+        collpane = wx.CollapsiblePane(self.panel, wx.ID_ANY, "Advanced Options:")
+        mainSizer.Add(collpane, 0, wx.EXPAND | wx.ALL, 5)
+
+        win = collpane.GetPane()
+        paneSz = wx.StaticBoxSizer(wx.VERTICAL, win, "Erweiterte Optionnen:")
+        self.include_cover_checkbox = wx.CheckBox(win, wx.ID_ANY, u"Titelbild von der Titelseite entfernen", wx.DefaultPosition, wx.DefaultSize, 0)
+        paneSz.Add(self.include_cover_checkbox, 0, wx.ALL | wx.EXPAND, 2)
+        self.include_css_checkbox = wx.CheckBox(win, wx.ID_ANY, u"CSS Einbinden", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.include_css_checkbox.SetValue(True)
+        paneSz.Add(self.include_css_checkbox, 0, wx.ALL | wx.EXPAND, 2)
+        self.include_css_checkbox = wx.CheckBox(win, wx.ID_ANY, u"Popup Fußnoten", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.include_css_checkbox.SetValue(True)
+        paneSz.Add(self.include_css_checkbox, 0, wx.ALL | wx.EXPAND, 2)
 
 
-        # Add the horizontal box sizer to the vertical box sizer
-        bSizer1.Add(bSizer2, 0 ,wx.ALL |wx.ALIGN_CENTER_HORIZONTAL ,5)
 
+        win.SetSizer(paneSz)
+        paneSz.SetSizeHints(win)
 
-        self.panel.SetSizer(bSizer1)
+        self.panel.SetSizer(mainSizer)
         self.Layout()
 
         self.Centre(wx.BOTH)
@@ -191,16 +202,16 @@ class MyFrame2(wx.Frame):
             if exe == True:
                 test_script_path = os.path.join(bundle_dir, "converter.exe")
                 if self.cover_image_path:
-                    subprocess.run([test_script_path, "-d", output_directory, "--addcover", self.cover_image_path,"--deletedecover", str(self.include_cover_checkbox.GetValue())])
+                    subprocess.run([test_script_path, "-d", output_directory, "--addcover", self.cover_image_path,"--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.include_css_checkbox.GetValue())])
                 else:
-                    subprocess.run([test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue())])
+                    subprocess.run([test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.include_css_checkbox.GetValue())])
 
             elif exe == False:      
                 test_script_path = os.path.join(bundle_dir, "converter.py")
                 if self.cover_image_path:
-                    subprocess.run(["python", test_script_path, "-d", output_directory, "--addcover", self.cover_image_path, "--deletedecover", str(self.include_cover_checkbox.GetValue())])
+                    subprocess.run(["python", test_script_path, "-d", output_directory, "--addcover", self.cover_image_path, "--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.include_css_checkbox.GetValue())])
                 else:
-                    subprocess.run(["python", test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue())])
+                    subprocess.run(["python", test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.include_css_checkbox.GetValue())])
             
             wx.CallAfter(self.show_conversion_complete_message)
         

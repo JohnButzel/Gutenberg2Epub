@@ -40,7 +40,7 @@ def create_output_directory(output_dir, author_name, book_title):
 def download_and_save_css(css_link, url, css_directory):
     css_url = urljoin(url, css_link['href'])
     css_response = requests.get(css_url)
-    css_content = css_response.text
+    css_content = css_response.content.decode('utf-8')
     css_filename = os.path.join(css_directory, os.path.basename(css_url))
     with open(css_filename, 'w', encoding='utf-8') as css_file:
         css_file.write(css_content)
@@ -102,7 +102,7 @@ def find_and_process_chapters(url, output_directory, author_name, book_title, so
             if author_name in h5.get_text() or book_title in h5.get_text():
                 h5.extract()
 
-        # Find and replace <a> tags with <span> tags
+        # Find and replace <a> tags with <span> tags; Replace Pages with Pagebreaks
         for a_tag in chapter_soup.find_all('a'):
             if a_tag.has_attr('id') and a_tag.has_attr('name') and a_tag.has_attr('title'):
                 new_tag = chapter_soup.new_tag('span', **{'epub:type': 'pagebreak', 'id': a_tag['id'], 'title': a_tag['name']})
