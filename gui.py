@@ -41,7 +41,7 @@ class MyFrame2(wx.Frame):
         mainSizer.Add(buttonSizer, 0, wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, 5)
 
         # Create the collapsible pane for "Advanced Options"
-        collpane = wx.CollapsiblePane(self.panel, wx.ID_ANY, "Advanced Options:")
+        collpane = wx.CollapsiblePane(self.panel, wx.ID_ANY, "Erweiterte Optionnen:")
         mainSizer.Add(collpane, 0, wx.EXPAND | wx.ALL, 5)
 
         win = collpane.GetPane()
@@ -51,9 +51,9 @@ class MyFrame2(wx.Frame):
         self.include_css_checkbox = wx.CheckBox(win, wx.ID_ANY, u"CSS Einbinden", wx.DefaultPosition, wx.DefaultSize, 0)
         self.include_css_checkbox.SetValue(True)
         paneSz.Add(self.include_css_checkbox, 0, wx.ALL | wx.EXPAND, 2)
-        self.include_css_checkbox = wx.CheckBox(win, wx.ID_ANY, u"Popup Fußnoten", wx.DefaultPosition, wx.DefaultSize, 0)
-        self.include_css_checkbox.SetValue(True)
-        paneSz.Add(self.include_css_checkbox, 0, wx.ALL | wx.EXPAND, 2)
+        self.process_footnotes = wx.CheckBox(win, wx.ID_ANY, u"Popup Fußnoten", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.process_footnotes.SetValue(True)
+        paneSz.Add(self.process_footnotes, 0, wx.ALL | wx.EXPAND, 2)
 
 
 
@@ -202,16 +202,16 @@ class MyFrame2(wx.Frame):
             if exe == True:
                 test_script_path = os.path.join(bundle_dir, "converter.exe")
                 if self.cover_image_path:
-                    subprocess.run([test_script_path, "-d", output_directory, "--addcover", self.cover_image_path,"--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.include_css_checkbox.GetValue())])
+                    subprocess.run([test_script_path, "-d", output_directory, "--addcover", self.cover_image_path,"--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.process_footnotes.GetValue())])
                 else:
-                    subprocess.run([test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.include_css_checkbox.GetValue())])
+                    subprocess.run([test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.process_footnotes.GetValue())])
 
             elif exe == False:      
                 test_script_path = os.path.join(bundle_dir, "converter.py")
                 if self.cover_image_path:
-                    subprocess.run(["python", test_script_path, "-d", output_directory, "--addcover", self.cover_image_path, "--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.include_css_checkbox.GetValue())])
+                    subprocess.run(["python", test_script_path, "-d", output_directory, "--addcover", self.cover_image_path, "--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.process_footnotes.GetValue())])
                 else:
-                    subprocess.run(["python", test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.include_css_checkbox.GetValue())])
+                    subprocess.run(["python", test_script_path, "-d", output_directory,"--deletedecover", str(self.include_cover_checkbox.GetValue()), "--remove-css", str(not self.include_css_checkbox.GetValue()), "--popup-footnotes", str(self.process_footnotes.GetValue())])
             
             wx.CallAfter(self.show_conversion_complete_message)
         

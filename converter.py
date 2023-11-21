@@ -296,11 +296,12 @@ def convert_to_epub(html_directory):
 
         # Add the spine (order of contents)
         book.spine = spine
-        
-    if args.popup_footnotes:
         # Add the default NCX and Nav file
         book.add_item(epub.EpubNcx())
         book.add_item(epub.EpubNav())
+
+        
+    if args.popup_footnotes:
         footnotes_content += '''
         </body>
         </html>
@@ -397,7 +398,7 @@ if __name__ == "__main__":
     parser.add_argument("--addcover", help="Path to cover image")
     parser.add_argument("-d", "--output-dir", default="output", help="Directory to save the output")
     parser.add_argument("--deletedecover", type=lambda x: x.lower() == 'true', default=False, help="Remove cover image from the titelpage.")
-    parser.add_argument("--remove-css", "--css", type=lambda x: x.lower() == 'true' , default=False, help="Exclude CSS file in the EPUB.")
+    parser.add_argument("--remove-css", "--css", type=lambda y: y.lower() == 'true' , default=False, help="Exclude CSS file in the EPUB.")
     parser.add_argument("--popup-footnotes", type=lambda x: x.lower() == 'true', default=True, help="Convert footnotes to popup footnotes.")
     args = parser.parse_args()
         
