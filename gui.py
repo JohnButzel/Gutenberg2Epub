@@ -76,6 +76,9 @@ class MyFrame2(wx.Frame):
     def on_load_book_button(self, event):
         self.m_button1.Disable()
         self.add_cover_button.Disable()
+        self.process_footnotes.Disable()
+        self.include_css_checkbox.Disable()
+        self.include_cover_checkbox.Disable()
         url_or_path = self.m_textCtrl1.GetValue()
         output_directory = self.output_dir_picker.GetPath()  # Get the selected output directory
         
@@ -88,6 +91,9 @@ class MyFrame2(wx.Frame):
                 show_error_message("Keine Internetverbindung! Bitte stellen Sie sicher, dass Sie mit dem Internet verbunden sind.", "Error")
                 self.m_button1.Enable()
                 self.add_cover_button.Enable()
+                self.process_footnotes.Enable()
+                self.include_css_checkbox.Enable()
+                self.include_cover_checkbox.Enable()
                 return
             
             # Validate the URL pattern
@@ -96,12 +102,23 @@ class MyFrame2(wx.Frame):
                 show_error_message("Ungültiges URL-Format! Bitte geben Sie eine gültige Gutenberg-de-URL ein.", "Error")
                 self.m_button1.Enable()
                 self.add_cover_button.Enable()
+                self.process_footnotes.Enable()
+                self.include_css_checkbox.Enable()
+                self.include_cover_checkbox.Enable()
                 return
 
              # Run the scraping process using a thread
             scraping_thread = threading.Thread(target=self.run_scraping, args=(url_or_path, output_directory))
             scraping_thread.start()
         else:
+            if url_or_path == "":
+                show_error_message("Bitte geben Sie eine URL oder Pfad ein.", "Error")
+                self.m_button1.Enable()
+                self.add_cover_button.Enable()
+                self.process_footnotes.Enable()
+                self.include_css_checkbox.Enable()
+                self.include_cover_checkbox.Enable()
+                return
             # The input is a local path, so run localprocess.py
             processing_thread = threading.Thread(target=self.run_local_process, args=(url_or_path, output_directory))
             processing_thread.start()
@@ -145,11 +162,17 @@ class MyFrame2(wx.Frame):
                 wx.CallAfter(show_error_message, f"Scraping the book failed: {result.stderr}", "Error")
                 self.m_button1.Enable()
                 self.add_cover_button.Enable()
+                self.process_footnotes.Enable()
+                self.include_css_checkbox.Enable()
+                self.include_cover_checkbox.Enable()
 
         except Exception as e:
             wx.CallAfter(show_error_message, f"An error occurred while scraping the book: {e}", "Error")
             self.m_button1.Enable()
             self.add_cover_button.Enable()
+            self.process_footnotes.Enable()
+            self.include_css_checkbox.Enable()
+            self.include_cover_checkbox.Enable()
 
     def run_local_process(self, local_path, output_directory):
         try:
@@ -181,11 +204,18 @@ class MyFrame2(wx.Frame):
                 wx.CallAfter(show_error_message, f"Scraping the book failed: {result.stderr}", "Error")
                 self.m_button1.Enable()
                 self.add_cover_button.Enable()
+                self.process_footnotes.Enable()
+                self.include_css_checkbox.Enable()
+                self.include_cover_checkbox.Enable()
+
 
         except Exception as e:
             wx.CallAfter(show_error_message, f"An error occurred while processing the book: {e}", "Error")
             self.m_button1.Enable()
             self.add_cover_button.Enable()
+            self.process_footnotes.Enable()
+            self.include_css_checkbox.Enable()
+            self.include_cover_checkbox.Enable()
 
 
     def run_conversion(self, output_directory):
@@ -222,6 +252,10 @@ class MyFrame2(wx.Frame):
     def show_conversion_complete_message(self):
         self.m_button1.Enable()
         self.add_cover_button.Enable()
+        self.process_footnotes.Enable()
+        self.include_css_checkbox.Enable()
+        self.include_cover_checkbox.Enable()
+
         wx.MessageBox("Ebook conversion complete!", "Info")
 
 
