@@ -47,7 +47,7 @@ def download_and_save_css(css_link, url, css_directory):
     css_link['href'] = os.path.join('css', os.path.basename(css_url))
 
 def remove_unwanted_elements(soup):
-    classes_to_remove = ['dropdown', 'main-nav', 'mainnav', 'top', 'center', 'bottomnavi-gb']
+    classes_to_remove = ['dropdown', 'main-nav', 'mainnav', 'top', 'center', 'bottomnavi-gb', 'anzeige-chap']
     for class_to_remove in classes_to_remove:
         elements_to_remove = soup.find_all(class_=class_to_remove)
         for element in elements_to_remove:
@@ -119,7 +119,7 @@ def find_and_process_chapters(url, output_directory, author_name, book_title, so
 
         # Remove unwanted elements based on classes and attributes
         classes_and_attributes_to_remove = [
-            ['dropdown', 'main-nav', 'mainnav', 'top', 'bottomnavi-gb'],
+            ['dropdown', 'main-nav', 'mainnav', 'top', 'bottomnavi-gb', 'anzeige-chap'],
             {'hr': {'color': '#808080', 'size': '1'}, 'a': {'href': 'titlepage.html'}, 'a': {'href': 'chap002.html', 'style': 'float: right;'}, 'a': {'href': '/info/texte/index.html'}}
         ]
         for item in classes_and_attributes_to_remove:

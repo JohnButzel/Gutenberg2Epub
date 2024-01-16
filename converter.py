@@ -300,8 +300,8 @@ def convert_to_epub(html_directory):
         book.add_item(epub.EpubNcx())
         book.add_item(epub.EpubNav())
 
-        
-    if args.popup_footnotes:
+  
+    if args.popup_footnotes and total_footnote_count > 1:
         footnotes_content += '''
         </body>
         </html>
