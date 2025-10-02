@@ -12,7 +12,7 @@ def validate_url(url):
 
 def run_gscraper(url, output_directory):
     try:
-        gscraper_script_path = "gscraper.py"  # Assuming gscraper.py is in the same directory
+        gscraper_script_path = "gScraper.py"  # Assuming gscraper.py is in the same directory
 
         result = subprocess.run(["python", gscraper_script_path, url, "-d", output_directory], capture_output=True, text=True, check=True)
 
