@@ -348,7 +348,7 @@ def convert_to_epub(html_directory):
 
                 
     #delete the /temp from html_directory
-    epub_directory = html_directory.replace('\\temp', '')
+    epub_directory = os.path.dirname(html_directory)
     # Create an EPUB file
     epub_file = os.path.join(epub_directory, book_title + '.epub')
     epub.write_epub(epub_file, book, {})

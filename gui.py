@@ -149,7 +149,7 @@ class MyFrame2(wx.Frame):
             if exe == True:
                 result = subprocess.run([gscraper_script_path, url, "-d", output_directory], capture_output=True, text=True)
             elif exe == False:      
-                result = subprocess.run(["python", "gscraper.py", url, "-d", output_directory], capture_output=True, text=True)
+                result = subprocess.run(["python", "gScraper.py", url, "-d", output_directory], capture_output=True, text=True)
 
             output_directory = result.stdout.strip()
             print(output_directory)
